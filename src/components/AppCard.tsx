@@ -8,61 +8,33 @@ interface AppCardProps {
 }
 
 export default function AppCard({ app, style, onClick }: AppCardProps) {
+    let icon = '📄';
+    let colorClass = 'bg-indigo-50 text-indigo-600';
+    if (app.tag.includes('게임') || app.tag.includes('엔터테인먼트')) { icon = '🎮'; colorClass = 'bg-green-50 text-green-600'; }
+    else if (app.tag.includes('학생')) { icon = '💯'; colorClass = 'bg-blue-50 text-blue-600'; }
+    else if (app.tag.includes('직장인')) { icon = '💼'; colorClass = 'bg-orange-50 text-orange-600'; }
+    else if (app.tag.includes('유틸리티') || app.tag.includes('생산성')) { icon = '⚙️'; colorClass = 'bg-slate-100 text-slate-600'; }
+
     return (
-        <div style={{ ...styles.card, ...style }} onClick={onClick}>
-            <span style={styles.tag}>{app.tag}</span>
-            <div style={styles.content}>
-                <h3 style={styles.title}>{app.name}</h3>
-                <p style={styles.desc}>{app.desc}</p>
+        <div 
+            className="w-full h-full bg-white rounded-2xl p-4 flex flex-col justify-between border border-slate-100 shadow-card cursor-pointer pointer-events-auto hover:shadow-lg transition-shadow"
+            style={style} 
+            onClick={onClick}
+        >
+            <div>
+                <div className="flex justify-between items-start mb-3">
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-xl ${colorClass}`}>
+                        {icon}
+                    </div>
+                    <span className="text-[10px] font-bold px-2 py-1 bg-slate-100 text-slate-500 rounded-md whitespace-nowrap">{app.tag || '미분류'}</span>
+                </div>
+                <h3 className="font-bold text-slate-800 text-[15px] mb-1 truncate">{app.name}</h3>
+                <p className="text-[12px] text-slate-500 line-clamp-2 leading-relaxed">{app.desc}</p>
+            </div>
+            <div className="mt-2 pt-2 border-t border-slate-50 flex justify-between items-center text-indigo-600">
+                <span className="text-xs font-semibold">실행하기</span>
+                <i className="ph-bold ph-arrow-right"></i>
             </div>
         </div>
     );
 }
-
-const styles: { [key: string]: CSSProperties } = {
-    card: {
-        width: '260px',
-        height: '130px',
-        background: 'var(--card-bg)',
-        borderRadius: '20px',
-        padding: '20px',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-        boxShadow: 'var(--card-shadow)',
-        backdropFilter: 'blur(8px)',
-        border: '1px solid rgba(255, 255, 255, 1)',
-        overflow: 'hidden',
-        pointerEvents: 'auto',
-        transition: 'box-shadow 0.2s ease',
-        cursor: 'pointer'
-    },
-    tag: {
-        alignSelf: 'flex-start',
-        background: '#e8eaed',
-        color: '#3c4043',
-        padding: '4px 10px',
-        borderRadius: '12px',
-        fontSize: '12px',
-        fontWeight: 600
-    },
-    content: {
-        display: 'flex',
-        flexDirection: 'column'
-    },
-    title: {
-        fontSize: '18px',
-        fontWeight: 700,
-        marginBottom: '6px',
-        color: 'var(--text-main)'
-    },
-    desc: {
-        fontSize: '13px',
-        color: 'var(--text-sub)',
-        lineHeight: 1.4,
-        display: '-webkit-box',
-        WebkitLineClamp: 2,
-        WebkitBoxOrient: 'vertical',
-        overflow: 'hidden'
-    }
-};

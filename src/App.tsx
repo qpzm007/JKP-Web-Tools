@@ -6,6 +6,8 @@ import ListView from './components/ListView';
 import AppUpload from './pages/AppUpload';
 import AdminDashboard from './pages/AdminDashboard';
 import AppSandbox from './components/AppSandbox';
+import AppBottomSheet from './components/AppBottomSheet';
+import CategoryBar from './components/CategoryBar';
 import { onAuthStateChanged } from 'firebase/auth';
 import type { User } from 'firebase/auth';
 import { auth, db } from './firebaseConfig';
@@ -32,7 +34,9 @@ export const DUMMY_APPS: AppData[] = [
 
 function MainViews({ isGravityView }: { isGravityView: boolean }) {
   const [liveApps, setLiveApps] = React.useState<AppData[]>(DUMMY_APPS);
-  const [activeApp, setActiveApp] = React.useState<AppData | null>(null);
+  const [activeCategory, setActiveCategory] = React.useState('전체보기');
+  const [selectedApp, setSelectedApp] = React.useState<AppData | null>(null);
+  const [executingApp, setExecutingApp] = React.useState<AppData | null>(null);
 
   useEffect(() => {
     const loadApprovedApps = async () => {
@@ -68,18 +72,35 @@ function MainViews({ isGravityView }: { isGravityView: boolean }) {
     return () => { document.body.style.overflow = 'auto'; }; // Reset when unmounting
   }, [isGravityView]);
 
+  const filteredApps = activeCategory === '전체보기' 
+      ? liveApps 
+      : liveApps.filter(app => app.tag.includes(activeCategory.replace(/[^가-힣]/g, '')));
+
   return (
-    <main className="content-area">
-      {isGravityView ? (
-        <GravityView apps={liveApps} isActive={true} onAppOpen={setActiveApp} />
-      ) : (
-        <ListView apps={liveApps} onAppOpen={setActiveApp} />
-      )}
+    <main className="flex-1 relative bg-slate-50 overflow-hidden flex flex-col">
+      <CategoryBar active={activeCategory} onSelect={setActiveCategory} />
       
-      {activeApp && (
+      <div className="flex-1 relative">
+          {isGravityView ? (
+            <GravityView apps={filteredApps} isActive={true} onAppOpen={setSelectedApp} />
+          ) : (
+            <ListView apps={filteredApps} onAppOpen={setSelectedApp} />
+          )}
+      </div>
+      
+      <AppBottomSheet 
+          app={selectedApp} 
+          onClose={() => setSelectedApp(null)} 
+          onLaunch={(app) => {
+              setSelectedApp(null);
+              setExecutingApp(app);
+          }}
+      />
+      
+      {executingApp && (
         <AppSandbox 
-            app={activeApp} 
-            onClose={() => setActiveApp(null)} 
+            app={executingApp} 
+            onClose={() => setExecutingApp(null)} 
         />
       )}
     </main>

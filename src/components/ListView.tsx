@@ -9,44 +9,24 @@ interface ListViewProps {
 
 export default function ListView({ apps, onAppOpen }: ListViewProps) {
     return (
-        <div style={styles.container}>
-            <div style={styles.grid}>
+        <div className="w-full h-full overflow-y-auto px-4 py-6 bg-slate-50">
+            <div className="grid gap-4 mx-auto max-w-7xl" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))' }}>
                 {apps.map(app => (
-                    <AppCard 
-                        key={app.id} 
-                        app={app} 
-                        style={styles.cardOverrides} 
-                        onClick={async () => {
-                            const canLaunch = await handleAppLaunch(app);
-                            if (canLaunch && onAppOpen) {
-                                onAppOpen(app);
-                            }
-                        }}
-                    />
+                    <div key={app.id} style={{ height: '190px', width: '100%' }}>
+                        <AppCard 
+                            app={app} 
+                            onClick={async () => {
+                                const canLaunch = await handleAppLaunch(app);
+                                if (canLaunch && onAppOpen) {
+                                    onAppOpen(app);
+                                }
+                            }}
+                        />
+                    </div>
                 ))}
             </div>
         </div>
     );
 }
 
-const styles = {
-    container: {
-        width: '100%',
-        height: '100%',
-        overflowY: 'auto' as const,
-        padding: '40px'
-    },
-    grid: {
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-        gap: '24px',
-        maxWidth: '1200px',
-        margin: '0 auto'
-    },
-    cardOverrides: {
-        position: 'relative' as const,
-        width: '100%',
-        height: '140px',
-        transform: 'none'
-    }
-};
+

@@ -67,8 +67,8 @@ export default function GravityView({ apps, isActive, onAppOpen }: GravityViewPr
 
         Composite.add(world, [ground, leftWall, rightWall, ceiling]);
 
-        const cardWidth = 260;
-        const cardHeight = 130;
+        const cardWidth = 160;
+        const cardHeight = 180;
         const initCardMaps: CardBodyMap[] = [];
 
         apps.forEach((app, idx) => {
