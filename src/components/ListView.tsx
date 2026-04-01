@@ -4,9 +4,10 @@ import { handleAppLaunch } from '../services/appUsage';
 
 interface ListViewProps {
     apps: AppData[];
+    onAppOpen?: (app: AppData) => void;
 }
 
-export default function ListView({ apps }: ListViewProps) {
+export default function ListView({ apps, onAppOpen }: ListViewProps) {
     return (
         <div style={styles.container}>
             <div style={styles.grid}>
@@ -17,8 +18,8 @@ export default function ListView({ apps }: ListViewProps) {
                         style={styles.cardOverrides} 
                         onClick={async () => {
                             const canLaunch = await handleAppLaunch(app);
-                            if (canLaunch) {
-                                alert(`[앱 실행 모달 창]\n${app.name}\n- ${app.desc}`);
+                            if (canLaunch && onAppOpen) {
+                                onAppOpen(app);
                             }
                         }}
                     />

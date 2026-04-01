@@ -7,6 +7,7 @@ import { handleAppLaunch } from '../services/appUsage';
 interface GravityViewProps {
     apps: AppData[];
     isActive: boolean;
+    onAppOpen?: (app: AppData) => void;
 }
 
 interface CardBodyMap {
@@ -14,7 +15,7 @@ interface CardBodyMap {
     body: Matter.Body;
 }
 
-export default function GravityView({ apps, isActive }: GravityViewProps) {
+export default function GravityView({ apps, isActive, onAppOpen }: GravityViewProps) {
     const sceneRef = useRef<HTMLDivElement>(null);
     const engineRef = useRef<Matter.Engine | null>(null);
     const renderRef = useRef<Matter.Render | null>(null);
@@ -126,8 +127,8 @@ export default function GravityView({ apps, isActive }: GravityViewProps) {
             if (validBodies.length > 0 && !isDragging) {
                 const clickedBody = validBodies[0] as any;
                 const canLaunch = await handleAppLaunch(clickedBody.appData);
-                if (canLaunch) {
-                    alert(`[앱 실행 모달 창]\n${clickedBody.appData.name}\n- ${clickedBody.appData.desc}`);
+                if (canLaunch && onAppOpen) {
+                    onAppOpen(clickedBody.appData);
                 }
             }
         });

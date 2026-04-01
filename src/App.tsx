@@ -5,6 +5,7 @@ import GravityView from './components/GravityView';
 import ListView from './components/ListView';
 import AppUpload from './pages/AppUpload';
 import AdminDashboard from './pages/AdminDashboard';
+import AppSandbox from './components/AppSandbox';
 import { onAuthStateChanged } from 'firebase/auth';
 import type { User } from 'firebase/auth';
 import { auth, db } from './firebaseConfig';
@@ -31,6 +32,7 @@ export const DUMMY_APPS: AppData[] = [
 
 function MainViews({ isGravityView }: { isGravityView: boolean }) {
   const [liveApps, setLiveApps] = React.useState<AppData[]>(DUMMY_APPS);
+  const [activeApp, setActiveApp] = React.useState<AppData | null>(null);
 
   useEffect(() => {
     const loadApprovedApps = async () => {
@@ -69,9 +71,16 @@ function MainViews({ isGravityView }: { isGravityView: boolean }) {
   return (
     <main className="content-area">
       {isGravityView ? (
-        <GravityView apps={liveApps} isActive={true} />
+        <GravityView apps={liveApps} isActive={true} onAppOpen={setActiveApp} />
       ) : (
-        <ListView apps={liveApps} />
+        <ListView apps={liveApps} onAppOpen={setActiveApp} />
+      )}
+      
+      {activeApp && (
+        <AppSandbox 
+            app={activeApp} 
+            onClose={() => setActiveApp(null)} 
+        />
       )}
     </main>
   );
