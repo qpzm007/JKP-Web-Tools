@@ -5,12 +5,12 @@ import { getFirestore } from "firebase/firestore";
 
 // TODO: Replace with your actual Firebase project configuration
 const firebaseConfig = {
-  apiKey: "",
-  authDomain: "",
-  projectId: "",
-  storageBucket: "",
-  messagingSenderId: "",
-  appId: ""
+  apiKey: "AIzaSyAUrb32EHnnwigfso1htn9r1oOZUe0A2xI",
+  authDomain: "jkp-web-tools.firebaseapp.com",
+  projectId: "jkp-web-tools",
+  storageBucket: "jkp-web-tools.firebasestorage.app",
+  messagingSenderId: "315649504826",
+  appId: "1:315649504826:web:b874dcc5460688559fe703"
 };
 
 // Initialize Firebase Application conditionally
