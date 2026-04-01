@@ -1,13 +1,12 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './components/Header';
-import GravityView from './components/GravityView';
+import CategoryBar from './components/CategoryBar';
 import ListView from './components/ListView';
 import AppUpload from './pages/AppUpload';
 import AdminDashboard from './pages/AdminDashboard';
 import AppSandbox from './components/AppSandbox';
 import AppBottomSheet from './components/AppBottomSheet';
-import CategoryBar from './components/CategoryBar';
 import { onAuthStateChanged } from 'firebase/auth';
 import type { User } from 'firebase/auth';
 import { auth, db } from './firebaseConfig';
@@ -22,18 +21,11 @@ export interface AppData {
   tag: string;
   executionType?: string;
   contentInfo?: string;
+  createdAt?: any;
 }
 
-export const DUMMY_APPS: AppData[] = [
-  { id: 1, name: "PDF 병합기", desc: "여러 PDF 파일을 하나로 합쳐보세요.", tag: "#생산성", executionType: 'html', contentInfo: '<h1>PDF 병합기 데모</h1>' },
-  { id: 2, name: "비용 정산기", desc: "영수증을 나누고 투명하게 정산하세요.", tag: "#직장인", executionType: 'html', contentInfo: '<h1>비용 정산기 데모</h1>' },
-  { id: 3, name: "점심 룰렛", desc: "고르기 힘든 오늘 점심 메뉴, 룰렛으로 결정해 드립니다.", tag: "#엔터테인먼트", executionType: 'html', contentInfo: '<h1>점심 룰렛 데모</h1>' },
-  { id: 4, name: "명함 메이커", desc: "나만의 감각적인 디지털 명함을 1분 만에 완성하세요.", tag: "#네트워킹", executionType: 'html', contentInfo: '<h1>명함 메이커 데모</h1>' },
-  { id: 5, name: "집중 타이머", desc: "뽀모도로 기법으로 집중력을 높이세요.", tag: "#자기계발", executionType: 'html', contentInfo: '<h1>타이머 데모</h1>' }
-];
-
-function MainViews({ isGravityView }: { isGravityView: boolean }) {
-  const [liveApps, setLiveApps] = React.useState<AppData[]>(DUMMY_APPS);
+function MainViews() {
+  const [liveApps, setLiveApps] = React.useState<AppData[]>([]);
   const [categories, setCategories] = React.useState<string[]>(['💼 직장인', '🎓 학생', '🛠 유틸리티', '🎮 게임']);
   const [activeCategory, setActiveCategory] = React.useState('전체보기');
   const [selectedApp, setSelectedApp] = React.useState<AppData | null>(null);
@@ -60,10 +52,19 @@ function MainViews({ isGravityView }: { isGravityView: boolean }) {
             desc: data.desc,
             tag: data.tag || '',
             executionType: data.executionType,
-            contentInfo: data.contentInfo
+            contentInfo: data.contentInfo,
+            createdAt: data.createdAt
           } as AppData;
         });
-        setLiveApps([...DUMMY_APPS, ...fetched]);
+        
+        // 정렬: 최신 등록순 (createdAt 기준 내림차순)
+        fetched.sort((a, b) => {
+          const timeA = a.createdAt?.seconds || 0;
+          const timeB = b.createdAt?.seconds || 0;
+          return timeB - timeA;
+        });
+        
+        setLiveApps(fetched);
       } catch (err) {
         console.error("Failed to load live apps", err);
       }
@@ -72,13 +73,8 @@ function MainViews({ isGravityView }: { isGravityView: boolean }) {
   }, []);
 
   useEffect(() => {
-    if (isGravityView) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'auto';
-    }
-    return () => { document.body.style.overflow = 'auto'; }; // Reset when unmounting
-  }, [isGravityView]);
+    document.body.style.overflow = 'auto';
+  }, []);
 
   const filteredApps = activeCategory === '전체보기' 
       ? liveApps 
@@ -88,12 +84,8 @@ function MainViews({ isGravityView }: { isGravityView: boolean }) {
     <main className="flex-1 relative bg-slate-50 overflow-hidden flex flex-col h-screen h-[100dvh]">
       <CategoryBar categories={categories} active={activeCategory} onSelect={setActiveCategory} />
       
-      <div className="flex-1 relative overflow-hidden">
-          {isGravityView ? (
-            <GravityView apps={filteredApps} isActive={true} onAppOpen={setSelectedApp} />
-          ) : (
-            <ListView apps={filteredApps} onAppOpen={setSelectedApp} />
-          )}
+      <div className="flex-1 relative overflow-auto">
+        <ListView apps={filteredApps} onAppOpen={setSelectedApp} />
       </div>
       
       <AppBottomSheet 
@@ -116,7 +108,6 @@ function MainViews({ isGravityView }: { isGravityView: boolean }) {
 }
 
 function App() {
-  const [isGravityView, setIsGravityView] = React.useState(true);
   const [user, setUser] = React.useState<User | null>(null);
 
   useEffect(() => {
@@ -129,13 +120,9 @@ function App() {
 
   return (
     <Router basename={import.meta.env.BASE_URL}>
-      <Header 
-        isGravityView={isGravityView} 
-        onToggle={() => setIsGravityView(!isGravityView)} 
-        user={user}
-      />
+      <Header user={user} />
       <Routes>
-        <Route path="/" element={<MainViews isGravityView={isGravityView} />} />
+        <Route path="/" element={<MainViews />} />
         <Route path="/upload" element={<AppUpload user={user} />} />
         <Route path="/admin" element={<AdminDashboard user={user} />} />
       </Routes>

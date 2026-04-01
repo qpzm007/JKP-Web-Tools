@@ -1,16 +1,14 @@
-import { LayoutGrid, Rocket, LogIn, Plus, Globe } from 'lucide-react';
+import { Rocket, LogIn, Plus, Globe } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import type { User } from 'firebase/auth';
 import { signInWithGoogle, logout } from '../firebaseConfig';
 import { useTranslation } from 'react-i18next';
 
 interface HeaderProps {
-    isGravityView: boolean;
-    onToggle: () => void;
     user: User | null;
 }
 
-export default function Header({ isGravityView, onToggle, user }: HeaderProps) {
+export default function Header({ user }: HeaderProps) {
     const navigate = useNavigate();
     const location = useLocation();
     const isUploadPage = location.pathname === '/upload';
@@ -24,9 +22,9 @@ export default function Header({ isGravityView, onToggle, user }: HeaderProps) {
     const isAdmin = user !== null; // 임시: 로그인한 모든 테스트 유저 허용
 
     return (
-        <header className="bg-white px-3 sm:px-4 py-2 sm:py-3 flex justify-between items-center shadow-sm z-40 relative">
+        <header className="bg-white px-3 sm:px-4 py-2 sm:py-3 flex flex-row justify-between items-center shadow-sm z-40 relative gap-2">
             <div 
-                className="flex items-center gap-1.5 sm:gap-2 cursor-pointer shrink-0" 
+                className="flex items-center gap-1.5 cursor-pointer shrink-0" 
                 onClick={() => navigate('/')}
             >
                 <div className="bg-indigo-600 text-white font-bold rounded p-1 text-xs flex items-center justify-center">
@@ -35,15 +33,7 @@ export default function Header({ isGravityView, onToggle, user }: HeaderProps) {
                 <h1 className="font-bold text-sm sm:text-lg tracking-tight text-slate-800 whitespace-nowrap">{t('JKP Web Tools')}</h1>
             </div>
             
-            <div className="flex items-center gap-1 sm:gap-3 shrink-0">
-                <button 
-                    className="p-2 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 active:scale-95 transition-all outline-none flex items-center justify-center" 
-                    onClick={onToggle}
-                    title={isGravityView ? t('리스트 뷰로 보기') : t('블럭 뷰로 보기')}
-                >
-                    {isGravityView ? <LayoutGrid size={22} /> : <i className="ph ph-squares-four text-[22px]" />}
-                </button>
-                
+            <div className="flex items-center gap-1 sm:gap-2 shrink-0 overflow-x-auto hide-scrollbar flex-nowrap">
                 <button 
                     className="p-2 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 active:scale-95 transition-all outline-none flex items-center justify-center" 
                     onClick={toggleLang}

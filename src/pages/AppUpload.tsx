@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { User } from 'firebase/auth';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, getDoc, doc } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 
 interface AppUploadProps {
@@ -21,6 +21,33 @@ export default function AppUpload({ user }: AppUploadProps) {
     const [execType, setExecType] = useState<'link' | 'html'>('link');
     const [execContent, setExecContent] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
+    
+    // Dynamic Categories
+    const [categoryOptions, setCategoryOptions] = useState<string[]>([]);
+    
+    React.useEffect(() => {
+        const fetchCategories = async () => {
+            if (!db) {
+                setCategoryOptions(['유틸리티', '게임', '학생', '직장인']);
+                return;
+            }
+            try {
+                const catDoc = await getDoc(doc(db, 'settings', 'app_categories'));
+                if (catDoc.exists() && catDoc.data().list) {
+                    const cats: string[] = catDoc.data().list;
+                    const filtered = cats.filter(c => !c.includes('전체보기'));
+                    setCategoryOptions(filtered);
+                    if (filtered.length > 0) setCategory(filtered[0]);
+                } else {
+                    setCategoryOptions(['유틸리티', '게임', '학생', '직장인']);
+                }
+            } catch (err) {
+                console.error("Failed to load categories:", err);
+                setCategoryOptions(['유틸리티', '게임', '학생', '직장인']);
+            }
+        };
+        fetchCategories();
+    }, []);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -125,10 +152,9 @@ export default function AppUpload({ user }: AppUploadProps) {
                         <div style={styles.formGroup}>
                             <label style={styles.label}>카테고리</label>
                             <select style={styles.select} value={category} onChange={e => setCategory(e.target.value)}>
-                                <option value="게임">게임</option>
-                                <option value="유틸리티">유틸리티</option>
-                                <option value="직장인">직장인</option>
-                                <option value="학생">학생</option>
+                                {categoryOptions.map(cat => (
+                                    <option key={cat} value={cat}>{cat}</option>
+                                ))}
                             </select>
                         </div>
                         
