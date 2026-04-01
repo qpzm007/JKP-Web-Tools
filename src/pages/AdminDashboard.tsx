@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { collection, query, getDocs, doc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { collection, query, getDocs, doc, updateDoc, deleteDoc, getDoc, setDoc } from 'firebase/firestore';
 import type { User } from 'firebase/auth';
 import { db } from '../firebaseConfig';
 import { CheckCircle, XCircle, Clock } from 'lucide-react';
@@ -21,6 +21,7 @@ interface AppDoc {
 export default function AdminDashboard({ user }: { user: User | null }) {
     const navigate = useNavigate();
     const [apps, setApps] = useState<AppDoc[]>([]);
+    const [categories, setCategories] = useState<string[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
     const isAdmin = user !== null; // 임시: 로그인한 모든 테스트 유저 허용
@@ -42,6 +43,14 @@ export default function AdminDashboard({ user }: { user: User | null }) {
         setIsLoading(true);
         try {
             const q = query(collection(db, 'apps'));
+            // Fetch Categories
+            const catDoc = await getDoc(doc(db, 'settings', 'app_categories'));
+            if (catDoc.exists()) {
+                setCategories(catDoc.data().list || []);
+            } else {
+                setCategories(['💼 직장인', '🎓 학생', '🛠 유틸리티', '🎮 게임']);
+            }
+
             const snap = await getDocs(q);
             const fetched = snap.docs.map(d => ({ id: d.id, ...d.data() })) as AppDoc[];
             // Sort to show pending first, then by newest
@@ -104,6 +113,32 @@ export default function AdminDashboard({ user }: { user: User | null }) {
         }
     };
 
+    const handleCategoryAdd = async () => {
+        if (!db) return;
+        const newCat = window.prompt("추가할 새 카테고리 이름을 입력하세요 (예: 📱 라이프스타일):");
+        if (!newCat || !newCat.trim()) return;
+        const newArr = [...categories, newCat];
+        await setDoc(doc(db, 'settings', 'app_categories'), { list: newArr });
+        setCategories(newArr);
+    };
+
+    const handleCategoryDelete = async (cat: string) => {
+        if (!db || !window.confirm(`'${cat}' 카테고리를 삭제하시겠습니까? (이 카테고리에 속한 앱들은 삭제되지 않습니다)`)) return;
+        const newArr = categories.filter(c => c !== cat);
+        await setDoc(doc(db, 'settings', 'app_categories'), { list: newArr });
+        setCategories(newArr);
+    };
+
+    const handleCategoryEdit = async (cat: string, idx: number) => {
+        if (!db) return;
+        const newName = window.prompt(`'${cat}' 카테고리의 새 이름을 입력하세요:`, cat);
+        if (!newName || !newName.trim()) return;
+        const newArr = [...categories];
+        newArr[idx] = newName;
+        await setDoc(doc(db, 'settings', 'app_categories'), { list: newArr });
+        setCategories(newArr);
+    };
+
     if (!user || isLoading) {
         return <div style={styles.loading}>데이터를 불러오는 중... (관리자 확인 중)</div>;
     }
@@ -121,7 +156,31 @@ export default function AdminDashboard({ user }: { user: User | null }) {
                 </div>
             </div>
 
+            {/* Category Management Section */}
+            <div style={styles.categoryContainer}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                    <h3 style={{ fontSize: '18px', fontWeight: 700, margin: 0 }}>카테고리(분류) 관리</h3>
+                    <button style={styles.addCategoryBtn} onClick={handleCategoryAdd}>
+                        + 새 카테고리 추가
+                    </button>
+                </div>
+                <div style={styles.categoryList}>
+                    <div style={styles.lockedCategory}>전체보기 (잠금)</div>
+                    {categories.map((cat, idx) => (
+                        <div key={idx} style={styles.categoryPill}>
+                            <span style={{ fontWeight: 600 }}>{cat}</span>
+                            <div style={{ display: 'flex', gap: '8px' }}>
+                                <button style={styles.categoryActionBtn} onClick={() => handleCategoryEdit(cat, idx)}>수정</button>
+                                <button style={styles.categoryActionBtnDelete} onClick={() => handleCategoryDelete(cat)}>삭제</button>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
             <div style={styles.listContainer}>
+                <h3 style={{ fontSize: '18px', fontWeight: 700, marginBottom: '2px', color: '#111' }}>등록된 앱 목록</h3>
+                <p style={{ fontSize: '13px', color: '#888', marginBottom: '16px' }}>수정 버튼을 눌러 앱 이름, 설명, 태그를 즉시 변경할 수 있습니다.</p>
                 {apps.length === 0 ? (
                     <div style={styles.empty}>등록된 앱이 없습니다.</div>
                 ) : (
@@ -338,6 +397,66 @@ const styles: Record<string, React.CSSProperties> = {
         border: '1px solid #90caf9',
         padding: '10px 20px',
         borderRadius: '8px',
+        fontWeight: 600,
+        cursor: 'pointer'
+    },
+    categoryContainer: {
+        background: '#fff',
+        borderRadius: '16px',
+        padding: '24px',
+        boxShadow: '0 4px 12px rgba(0,0,0,0.03)',
+        border: '1px solid #eee',
+        marginBottom: '30px'
+    },
+    categoryList: {
+        display: 'flex',
+        flexWrap: 'wrap' as const,
+        gap: '12px'
+    },
+    lockedCategory: {
+        background: '#f1f3f4',
+        color: '#9e9e9e',
+        padding: '8px 16px',
+        borderRadius: '8px',
+        fontSize: '14px',
+        fontWeight: 600,
+        pointerEvents: 'none' as const
+    },
+    categoryPill: {
+        background: '#f3f4f6',
+        padding: '6px 10px 6px 16px',
+        borderRadius: '8px',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '12px',
+        fontSize: '14px',
+        border: '1px solid #e5e7eb'
+    },
+    categoryActionBtn: {
+        background: '#fff',
+        border: '1px solid #d1d5db',
+        color: '#4b5563',
+        fontSize: '12px',
+        padding: '2px 8px',
+        borderRadius: '4px',
+        cursor: 'pointer'
+    },
+    categoryActionBtnDelete: {
+        background: '#fee2e2',
+        border: '1px solid #fca5a5',
+        color: '#b91c1c',
+        fontSize: '12px',
+        padding: '2px 8px',
+        borderRadius: '4px',
+        cursor: 'pointer'
+    },
+    addCategoryBtn: {
+        background: '#1a73e8',
+        color: '#fff',
+        border: 'none',
+        padding: '8px 16px',
+        borderRadius: '8px',
+        fontSize: '13px',
         fontWeight: 600,
         cursor: 'pointer'
     }

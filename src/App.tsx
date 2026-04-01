@@ -11,7 +11,7 @@ import CategoryBar from './components/CategoryBar';
 import { onAuthStateChanged } from 'firebase/auth';
 import type { User } from 'firebase/auth';
 import { auth, db } from './firebaseConfig';
-import { collection, query, where, getDocs } from 'firebase/firestore';
+import { collection, query, where, getDocs, getDoc, doc } from 'firebase/firestore';
 import './i18n'; // Translates setup
 import './index.css';
 
@@ -34,14 +34,22 @@ export const DUMMY_APPS: AppData[] = [
 
 function MainViews({ isGravityView }: { isGravityView: boolean }) {
   const [liveApps, setLiveApps] = React.useState<AppData[]>(DUMMY_APPS);
+  const [categories, setCategories] = React.useState<string[]>(['💼 직장인', '🎓 학생', '🛠 유틸리티', '🎮 게임']);
   const [activeCategory, setActiveCategory] = React.useState('전체보기');
   const [selectedApp, setSelectedApp] = React.useState<AppData | null>(null);
   const [executingApp, setExecutingApp] = React.useState<AppData | null>(null);
 
   useEffect(() => {
-    const loadApprovedApps = async () => {
+    const loadApprovedAppsAndCategories = async () => {
       if (!db) return;
       try {
+        // Fetch Categories
+        const catDoc = await getDoc(doc(db, 'settings', 'app_categories'));
+        if (catDoc.exists()) {
+          setCategories(catDoc.data().list || []);
+        }
+
+        // Fetch Apps
         const q = query(collection(db, 'apps'), where('status', '==', 'approved'));
         const snap = await getDocs(q);
         const fetched = snap.docs.map(doc => {
@@ -60,7 +68,7 @@ function MainViews({ isGravityView }: { isGravityView: boolean }) {
         console.error("Failed to load live apps", err);
       }
     };
-    loadApprovedApps();
+    loadApprovedAppsAndCategories();
   }, []);
 
   useEffect(() => {
@@ -78,7 +86,7 @@ function MainViews({ isGravityView }: { isGravityView: boolean }) {
 
   return (
     <main className="flex-1 relative bg-slate-50 overflow-hidden flex flex-col">
-      <CategoryBar active={activeCategory} onSelect={setActiveCategory} />
+      <CategoryBar categories={categories} active={activeCategory} onSelect={setActiveCategory} />
       
       <div className="flex-1 relative">
           {isGravityView ? (

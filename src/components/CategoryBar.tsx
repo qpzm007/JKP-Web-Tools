@@ -1,15 +1,16 @@
-const CATEGORIES = ['전체보기', '💼 직장인', '🎓 학생', '🛠 유틸리티', '🎮 게임'];
-
 interface CategoryBarProps {
+    categories: string[];
     active: string;
     onSelect: (cat: string) => void;
 }
 
-export default function CategoryBar({ active, onSelect }: CategoryBarProps) {
+export default function CategoryBar({ categories, active, onSelect }: CategoryBarProps) {
+    const fullCategories = ['전체보기', ...categories];
+
     return (
         <div className="bg-white border-b border-slate-100 z-30 relative shadow-sm">
             <div className="flex gap-2 overflow-x-auto px-4 py-3 hide-scrollbar snap-x">
-                {CATEGORIES.map(cat => (
+                {fullCategories.map(cat => (
                     <button 
                         key={cat}
                         onClick={() => onSelect(cat)}

@@ -9,14 +9,21 @@ interface BottomSheetProps {
 export default function AppBottomSheet({ app, onClose, onLaunch }: BottomSheetProps) {
     if (!app) return null;
 
-    // Use a basic mapping for icons/colors based on categories as provided in the mockup
+    // Use a basic mapping for icons/colors dynamically
     let icon = '📄';
     let bgColor = 'bg-indigo-50';
     let textColor = 'text-indigo-600';
+
+    // Extract emoji from the tag dynamically if exists
+    const emojiMatch = (app.tag || '').match(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/u);
+    if (emojiMatch) {
+        icon = emojiMatch[0];
+    }
     
-    if (app.tag.includes('게임') || app.tag.includes('엔터테인먼트')) { icon = '🎮'; bgColor = 'bg-green-50'; textColor = 'text-green-600'; }
-    else if (app.tag.includes('학생')) { icon = '💯'; bgColor = 'bg-blue-50'; textColor = 'text-blue-600'; }
-    else if (app.tag.includes('직장인')) { icon = '💼'; bgColor = 'bg-orange-50'; textColor = 'text-orange-600'; }
+    // Assign generic colors based on tag string hash or hardcoded keywords
+    if ((app.tag || '').includes('게임') || (app.tag || '').includes('엔터테인먼트')) { bgColor = 'bg-green-50'; textColor = 'text-green-600'; }
+    else if ((app.tag || '').includes('학생')) { bgColor = 'bg-blue-50'; textColor = 'text-blue-600'; }
+    else if ((app.tag || '').includes('직장인')) { bgColor = 'bg-orange-50'; textColor = 'text-orange-600'; }
 
     return (
         <>
