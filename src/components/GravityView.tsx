@@ -67,8 +67,8 @@ export default function GravityView({ apps, isActive, onAppOpen }: GravityViewPr
 
         Composite.add(world, [ground, leftWall, rightWall, ceiling]);
 
-        const cardWidth = 160;
-        const cardHeight = 180;
+        const cardWidth = 140;
+        const cardHeight = 150;
         const initCardMaps: CardBodyMap[] = [];
 
         apps.forEach((app, idx) => {
@@ -174,21 +174,33 @@ export default function GravityView({ apps, isActive, onAppOpen }: GravityViewPr
                     const pos = bodyPositions[map.id];
                     if (!pos) return null;
                     
-                    const cardWidth = 260;
-                    const cardHeight = 130;
+                    const cardWidth = 140;
+                    const cardHeight = 150;
                     const x = pos.x - (cardWidth / 2);
                     const y = pos.y - (cardHeight / 2);
 
                     return (
-                        <AppCard 
-                            key={map.id} 
-                            app={apps.find(a => a.id === map.id)!}
+                        <div 
+                            key={map.id}
+                            className="absolute top-0 left-0 pointer-events-auto"
                             style={{
-                                position: 'absolute',
+                                width: `${cardWidth}px`,
+                                height: `${cardHeight}px`,
                                 transform: `translate(${x}px, ${y}px) rotate(${pos.angle}rad)`,
                                 willChange: 'transform'
                             }}
-                        />
+                        >
+                            <AppCard 
+                                app={apps.find(a => a.id === map.id)!}
+                                onClick={async () => {
+                                    const app = apps.find(a => a.id === map.id);
+                                    if (app) {
+                                        const canLaunch = await handleAppLaunch(app);
+                                        if (canLaunch && onAppOpen) onAppOpen(app);
+                                    }
+                                }}
+                            />
+                        </div>
                     );
                 })}
             </div>

@@ -54,19 +54,19 @@ export default function Header({ isGravityView, onToggle, user }: HeaderProps) {
             
                 {!isUploadPage && (
                     <button 
-                        className="hidden md:flex items-center gap-1 px-4 py-1.5 rounded-full bg-indigo-50 text-indigo-700 font-medium text-sm hover:bg-indigo-100 transition-colors"
+                        className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-indigo-50 text-indigo-700 font-medium text-xs sm:text-sm hover:bg-indigo-100 transition-colors"
                         onClick={() => navigate('/upload')}
                     >
-                        <Plus size={16} /> {t('앱 등록하기')}
+                        <Plus size={14} /> <span className="hidden sm:inline">{t('앱 등록')}</span>
                     </button>
                 )}
                 
                 {isAdmin && (
                     <button 
-                        className="hidden md:flex items-center gap-1 px-3 py-1.5 rounded-full bg-amber-50 text-amber-700 font-bold text-sm border border-amber-200"
+                        className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-amber-50 text-amber-700 font-bold text-xs sm:text-sm border border-amber-200"
                         onClick={() => navigate('/admin')}
                     >
-                        👑 관리자
+                        👑 <span className="hidden sm:inline">관리자</span>
                     </button>
                 )}
                 
@@ -84,10 +84,10 @@ export default function Header({ isGravityView, onToggle, user }: HeaderProps) {
                     </button>
                 ) : (
                     <button 
-                        className="hidden md:flex items-center gap-2 bg-slate-800 text-white px-4 py-1.5 rounded-full text-sm font-semibold shadow-md active:scale-95 transition-transform" 
+                        className="flex items-center gap-1 sm:gap-2 bg-slate-800 text-white px-3 sm:px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold shadow-md active:scale-95 transition-transform" 
                         onClick={signInWithGoogle}
                     >
-                        <LogIn size={16} /> {t('구글 로그인')}
+                        <LogIn size={14} /> <span>{t('로그인')}</span>
                     </button>
                 )}
             </div>

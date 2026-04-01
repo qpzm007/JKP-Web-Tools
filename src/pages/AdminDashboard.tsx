@@ -70,6 +70,29 @@ export default function AdminDashboard({ user }: { user: User | null }) {
         }
     };
 
+    const handleEdit = async (app: AppDoc) => {
+        if (!db) return;
+        const newName = window.prompt("새로운 이름 (Name)을 입력하세요:", app.name);
+        if (newName === null) return;
+        const newDesc = window.prompt("새로운 설명 (Description)을 입력하세요:", app.desc);
+        if (newDesc === null) return;
+        const newTag = window.prompt("새로운 분류/태그 (Tag)를 입력하세요:", app.tag || "");
+        if (newTag === null) return;
+
+        try {
+            await updateDoc(doc(db, 'apps', app.id), {
+                name: newName,
+                desc: newDesc,
+                tag: newTag
+            });
+            setApps(apps.map(a => a.id === app.id ? { ...a, name: newName, desc: newDesc, tag: newTag } : a));
+            alert("성공적으로 수정되었습니다.");
+        } catch (error) {
+            console.error(error);
+            alert("수정 처리 중 오류 발생");
+        }
+    };
+
     const handleReject = async (id: string, name: string) => {
         if (!db || !window.confirm(`'${name}' 앱을 거절 및 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.`)) return;
         try {
@@ -103,7 +126,7 @@ export default function AdminDashboard({ user }: { user: User | null }) {
                     <div style={styles.empty}>등록된 앱이 없습니다.</div>
                 ) : (
                     apps.map(app => (
-                        <div key={app.id} style={{...styles.card, opacity: app.status === 'pending' ? 1 : 0.7}}>
+                        <div key={app.id} style={{ ...styles.card, border: app.status === 'pending' ? '2px solid #ffcc80' : '1px solid #e0e0e0', opacity: 1 }}>
                             <div style={styles.cardHeader}>
                                 <div>
                                     <h3 style={styles.appName}>
@@ -134,8 +157,11 @@ export default function AdminDashboard({ user }: { user: User | null }) {
                                         <CheckCircle size={16} /> 앱 승인/출시
                                     </button>
                                 )}
+                                <button style={styles.editBtn} onClick={() => handleEdit(app)}>
+                                    수정
+                                </button>
                                 <button style={styles.rejectBtn} onClick={() => handleReject(app.id, app.name)}>
-                                    <XCircle size={16} /> 삭제 (반려)
+                                    <XCircle size={16} /> 삭제
                                 </button>
                             </div>
                         </div>
@@ -298,6 +324,18 @@ const styles: Record<string, React.CSSProperties> = {
         background: '#fff',
         color: '#d32f2f',
         border: '1px solid #ef9a9a',
+        padding: '10px 20px',
+        borderRadius: '8px',
+        fontWeight: 600,
+        cursor: 'pointer'
+    },
+    editBtn: {
+        display: 'flex',
+        alignItems: 'center',
+        gap: '8px',
+        background: '#fff',
+        color: '#1976d2',
+        border: '1px solid #90caf9',
         padding: '10px 20px',
         borderRadius: '8px',
         fontWeight: 600,
