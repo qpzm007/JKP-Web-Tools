@@ -60,21 +60,25 @@ export default function GravityView({ apps, isActive, onAppOpen }: GravityViewPr
         renderRef.current = render;
 
         const wallOpts = { isStatic: true, render: { visible: false } };
-        const ground = Bodies.rectangle(cw / 2, ch + 30, cw * 2, 60, { ...wallOpts, restitution: 0.5 });
+        const ground = Bodies.rectangle(cw / 2, ch + 20, cw * 2, 60, { ...wallOpts, restitution: 0.5 });
         const leftWall = Bodies.rectangle(-30, ch / 2, 60, ch * 2, wallOpts);
         const rightWall = Bodies.rectangle(cw + 30, ch / 2, 60, ch * 2, wallOpts);
-        const ceiling = Bodies.rectangle(cw / 2, -1000, cw * 2, 60, wallOpts);
+        const ceiling = Bodies.rectangle(cw / 2, -3000, cw * 2, 60, wallOpts); // Moved very high
 
         Composite.add(world, [ground, leftWall, rightWall, ceiling]);
 
-        const cardWidth = 140;
-        const cardHeight = 150;
+        const isMobile = window.innerWidth < 640;
+        const SCALE = isMobile ? 0.7 : 1;
+        const originalWidth = 140;
+        const originalHeight = 150;
+        const cardWidth = originalWidth * SCALE;
+        const cardHeight = originalHeight * SCALE;
+        
         const initCardMaps: CardBodyMap[] = [];
 
         apps.forEach((app, idx) => {
             const startX = Math.random() * (cw - cardWidth) + cardWidth / 2;
-            // stagger spawn positions higher up
-            const startY = -400 - (idx * 200) - (Math.random() * 300);
+            const startY = -150 - (idx * 200) - (Math.random() * 150);
 
             const body = Bodies.rectangle(startX, startY, cardWidth, cardHeight, {
                 restitution: 0.6,
@@ -139,7 +143,7 @@ export default function GravityView({ apps, isActive, onAppOpen }: GravityViewPr
             const newCh = sceneRef.current.clientHeight;
             render.canvas.width = newCw;
             render.canvas.height = newCh;
-            Matter.Body.setPosition(ground, { x: newCw / 2, y: newCh + 30 });
+            Matter.Body.setPosition(ground, { x: newCw / 2, y: newCh + 20 });
             Matter.Body.setPosition(rightWall, { x: newCw + 30, y: newCh / 2 });
         };
         window.addEventListener('resize', handleResize);
@@ -174,8 +178,13 @@ export default function GravityView({ apps, isActive, onAppOpen }: GravityViewPr
                     const pos = bodyPositions[map.id];
                     if (!pos) return null;
                     
-                    const cardWidth = 140;
-                    const cardHeight = 150;
+                    const isMobile = window.innerWidth < 640;
+                    const SCALE = isMobile ? 0.7 : 1;
+                    const originalWidth = 140;
+                    const originalHeight = 150;
+                    const cardWidth = originalWidth * SCALE;
+                    const cardHeight = originalHeight * SCALE;
+                    
                     const x = pos.x - (cardWidth / 2);
                     const y = pos.y - (cardHeight / 2);
 
@@ -184,9 +193,10 @@ export default function GravityView({ apps, isActive, onAppOpen }: GravityViewPr
                             key={map.id}
                             className="absolute top-0 left-0 pointer-events-auto"
                             style={{
-                                width: `${cardWidth}px`,
-                                height: `${cardHeight}px`,
-                                transform: `translate(${x}px, ${y}px) rotate(${pos.angle}rad)`,
+                                width: `${originalWidth}px`,
+                                height: `${originalHeight}px`,
+                                transformOrigin: 'top left',
+                                transform: `translate(${x}px, ${y}px) rotate(${pos.angle}rad) scale(${SCALE})`,
                                 willChange: 'transform'
                             }}
                         >
