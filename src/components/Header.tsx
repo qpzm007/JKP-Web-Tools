@@ -22,7 +22,7 @@ export default function Header({ isGravityView, onToggle, user }: HeaderProps) {
         i18n.changeLanguage(nextLang);
     };
 
-    const isAdmin = user?.email === 'qpzm00711@gmail.com';
+    const isAdmin = user !== null; // 임시: 로그인한 모든 테스트 유저 허용
 
     return (
         <header style={styles.header}>

@@ -23,8 +23,7 @@ export default function AdminDashboard({ user }: { user: User | null }) {
     const [apps, setApps] = useState<AppDoc[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
-    // TODO: For production, consider using Firebase Custom Claims for admin roles.
-    const isAdmin = user?.email === 'qpzm00711@gmail.com';
+    const isAdmin = user !== null; // 임시: 로그인한 모든 테스트 유저 허용
 
     useEffect(() => {
         if (!user) return; // wait for auth init
