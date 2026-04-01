@@ -10,7 +10,7 @@ interface GravityViewProps {
 }
 
 interface CardBodyMap {
-    id: number;
+    id: string | number;
     body: Matter.Body;
 }
 
@@ -21,7 +21,7 @@ export default function GravityView({ apps, isActive }: GravityViewProps) {
     const runnerRef = useRef<Matter.Runner | null>(null);
     
     const [cardMaps, setCardMaps] = useState<CardBodyMap[]>([]);
-    const [bodyPositions, setBodyPositions] = useState<Record<number, { x: number, y: number, angle: number }>>({});
+    const [bodyPositions, setBodyPositions] = useState<Record<string | number, { x: number, y: number, angle: number }>>({});
 
     useEffect(() => {
         if (!sceneRef.current) return;
@@ -92,7 +92,7 @@ export default function GravityView({ apps, isActive }: GravityViewProps) {
         setCardMaps(initCardMaps);
 
         Events.on(engine, 'afterUpdate', () => {
-            const newPos: Record<number, { x: number, y: number, angle: number }> = {};
+            const newPos: Record<string | number, { x: number, y: number, angle: number }> = {};
             initCardMaps.forEach((map) => {
                 newPos[map.id] = {
                     x: map.body.position.x,

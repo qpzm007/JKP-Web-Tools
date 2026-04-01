@@ -6,7 +6,7 @@ const resources = {
     translation: {
       "JKP Web Tools": "JKP Web Tools",
       "리스트 뷰로 보기": "리스트 뷰로 보기",
-      "안티그래비티 뷰": "안티그래비티 뷰",
+      "블럭 뷰로 보기": "블럭 뷰로 보기",
       "앱 등록하기": "앱 등록하기",
       "구글 로그인": "구글 로그인",
       "로그아웃": "로그아웃"
@@ -16,7 +16,7 @@ const resources = {
     translation: {
       "JKP Web Tools": "JKP Web Tools",
       "리스트 뷰로 보기": "List View",
-      "안티그래비티 뷰": "Gravity View",
+      "블럭 뷰로 보기": "Block View",
       "앱 등록하기": "Submit App",
       "구글 로그인": "Login with Google",
       "로그아웃": "Logout"

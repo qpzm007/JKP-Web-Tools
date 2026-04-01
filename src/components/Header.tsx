@@ -22,6 +22,8 @@ export default function Header({ isGravityView, onToggle, user }: HeaderProps) {
         i18n.changeLanguage(nextLang);
     };
 
+    const isAdmin = user?.email === 'qpzm00711@gmail.com';
+
     return (
         <header style={styles.header}>
             <div 
@@ -54,7 +56,7 @@ export default function Header({ isGravityView, onToggle, user }: HeaderProps) {
                         {isGravityView ? (
                             <><LayoutGrid size={16} /> {t('리스트 뷰로 보기')}</>
                         ) : (
-                            <><Sparkles size={16} /> {t('안티그래비티 뷰')}</>
+                            <><Sparkles size={16} /> {t('블럭 뷰로 보기')}</>
                         )}
                     </button>
                 )}
@@ -67,6 +69,15 @@ export default function Header({ isGravityView, onToggle, user }: HeaderProps) {
                 >
                     <Plus size={16} strokeWidth={3} /> {t('앱 등록하기')}
                 </button>
+                
+                {isAdmin && (
+                    <button 
+                        style={styles.adminBtn} 
+                        onClick={() => navigate('/admin')}
+                    >
+                        👑 관리자
+                    </button>
+                )}
                 
                 <div style={styles.divider} />
 
@@ -169,6 +180,19 @@ const styles: Record<string, React.CSSProperties> = {
         cursor: 'pointer',
         transition: 'all 0.2s ease',
         boxShadow: '0 4px 12px rgba(26,115,232,0.15)'
+    },
+    adminBtn: {
+        display: 'flex',
+        alignItems: 'center',
+        gap: '6px',
+        background: '#fff3e0',
+        color: '#e65100',
+        border: '1px solid #ffcc80',
+        padding: '10px 16px',
+        borderRadius: '30px',
+        fontSize: '13px',
+        fontWeight: 800,
+        cursor: 'pointer'
     },
     userProfile: {
         display: 'flex',
