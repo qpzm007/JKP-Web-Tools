@@ -24,18 +24,18 @@ export default function Header({ isGravityView, onToggle, user }: HeaderProps) {
     const isAdmin = user !== null; // 임시: 로그인한 모든 테스트 유저 허용
 
     return (
-        <header className="bg-white px-4 py-3 flex justify-between items-center shadow-sm z-40 relative">
+        <header className="bg-white px-4 py-3 flex flex-col md:flex-row md:justify-between items-start md:items-center gap-3 md:gap-0 shadow-sm z-40 relative">
             <div 
-                className="flex items-center gap-2 cursor-pointer" 
+                className="flex items-center gap-2 cursor-pointer w-full md:w-auto" 
                 onClick={() => navigate('/')}
             >
-                <div className="bg-indigo-600 text-white font-bold rounded p-1.5 text-sm flex items-center justify-center">
+                <div className="bg-indigo-600 text-white font-bold rounded p-1.5 text-sm flex items-center justify-center shrink-0">
                     <Rocket size={16} />
                 </div>
                 <h1 className="font-bold text-lg tracking-tight text-slate-800">{t('JKP Web Tools')}</h1>
             </div>
             
-            <div className="flex items-center gap-3">
+            <div className="flex items-center flex-wrap gap-2 sm:gap-3 w-full md:w-auto justify-start md:justify-end">
                 <button 
                     className="p-2 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 active:scale-95 transition-all outline-none flex items-center justify-center" 
                     onClick={onToggle}
