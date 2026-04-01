@@ -16,6 +16,7 @@ export default function AppUpload({ user }: AppUploadProps) {
     const [activeLang, setActiveLang] = useState<'ko' | 'en'>('ko');
     const [desc, setDesc] = useState('');
     const [category, setCategory] = useState('유틸리티');
+    const [customTags, setCustomTags] = useState('');
     // We will save fake thumbnail data for now since actual storage setup wasn't requested yet
     const [thumbnail, setThumbnail] = useState<File | null>(null);
     const [execType, setExecType] = useState<'link' | 'html'>('link');
@@ -66,6 +67,12 @@ export default function AppUpload({ user }: AppUploadProps) {
         try {
             if (!db) throw new Error("Firebase DB가 연결되지 않았습니다. API 키를 확인하세요.");
             
+            // Parse custom tags
+            const parsedTags = customTags.split(',')
+                .map(t => t.trim())
+                .filter(t => t.length > 0)
+                .slice(0, 5); // Max 5 tags
+            
             // Thumbnail logging (for now, until storage logic is requested)
             if (thumbnail) console.log("Thumbnail selected:", thumbnail.name);
             
@@ -75,6 +82,7 @@ export default function AppUpload({ user }: AppUploadProps) {
                 name_en: titleEn,
                 desc: desc,
                 tag: `#${category}`,
+                searchTags: parsedTags,
                 executionType: execType,
                 contentInfo: execContent,
                 authorUid: user.uid,
@@ -157,17 +165,28 @@ export default function AppUpload({ user }: AppUploadProps) {
                                 ))}
                             </select>
                         </div>
-                        
-                        {/* 앱 썸네일 이미지 업로드 */}
-                        <div style={styles.formGroup}>
-                            <label style={styles.label}>썸네일 이미지 파일 업로드</label>
-                            <input 
-                                type="file" 
-                                style={styles.fileInput} 
-                                accept="image/*" 
-                                onChange={e => setThumbnail(e.target.files ? e.target.files[0] : null)} 
-                            />
-                        </div>
+                    </div>
+                    
+                    {/* 추가 태그 5개 (선택) */}
+                    <div style={styles.formGroup}>
+                        <label style={styles.label}>검색용 추가 태그 (최대 5개, 쉼표로 구분)</label>
+                        <input 
+                            style={styles.input} 
+                            placeholder="예: 뽀모도로, 생산성, 타이머, 집중, 시간관리" 
+                            value={customTags} 
+                            onChange={e => setCustomTags(e.target.value)} 
+                        />
+                    </div>
+                    
+                    {/* 앱 썸네일 이미지 업로드 */}
+                    <div style={styles.formGroup}>
+                        <label style={styles.label}>썸네일 이미지 파일 업로드</label>
+                        <input 
+                            type="file" 
+                            style={styles.fileInput} 
+                            accept="image/*" 
+                            onChange={e => setThumbnail(e.target.files ? e.target.files[0] : null)} 
+                        />
                     </div>
                     
                     {/* 실행 방식 선택 라디오 버튼 */}

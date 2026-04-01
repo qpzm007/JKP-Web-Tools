@@ -7,6 +7,8 @@ import AppUpload from './pages/AppUpload';
 import AdminDashboard from './pages/AdminDashboard';
 import AppSandbox from './components/AppSandbox';
 import AppBottomSheet from './components/AppBottomSheet';
+import Fuse from 'fuse.js';
+import { Search } from 'lucide-react';
 import { onAuthStateChanged } from 'firebase/auth';
 import type { User } from 'firebase/auth';
 import { auth, db } from './firebaseConfig';
@@ -19,6 +21,7 @@ export interface AppData {
   name: string;
   desc: string;
   tag: string;
+  searchTags?: string[];
   executionType?: string;
   contentInfo?: string;
   createdAt?: any;
@@ -28,6 +31,7 @@ function MainViews() {
   const [liveApps, setLiveApps] = React.useState<AppData[]>([]);
   const [categories, setCategories] = React.useState<string[]>(['💼 직장인', '🎓 학생', '🛠 유틸리티', '🎮 게임']);
   const [activeCategory, setActiveCategory] = React.useState('전체보기');
+  const [searchQuery, setSearchQuery] = React.useState('');
   const [selectedApp, setSelectedApp] = React.useState<AppData | null>(null);
   const [executingApp, setExecutingApp] = React.useState<AppData | null>(null);
 
@@ -51,6 +55,7 @@ function MainViews() {
             name: data.name,
             desc: data.desc,
             tag: data.tag || '',
+            searchTags: data.searchTags || [],
             executionType: data.executionType,
             contentInfo: data.contentInfo,
             createdAt: data.createdAt
@@ -76,16 +81,37 @@ function MainViews() {
     document.body.style.overflow = 'auto';
   }, []);
 
-  const filteredApps = activeCategory === '전체보기' 
+  const filteredByCategory = activeCategory === '전체보기' 
       ? liveApps 
       : liveApps.filter(app => app.tag.includes(activeCategory.replace(/[^가-힣]/g, '')));
 
+  let displayApps = filteredByCategory;
+  if (searchQuery.trim()) {
+      const fuse = new Fuse(filteredByCategory, {
+          keys: ['name', 'name_en', 'desc', 'tag', 'searchTags'],
+          threshold: 0.4,
+      });
+      displayApps = fuse.search(searchQuery).map(result => result.item);
+  }
+
   return (
     <main className="flex-1 relative bg-slate-50 overflow-hidden flex flex-col h-screen h-[100dvh]">
+      
+      <div className="bg-white border-b border-slate-100 px-4 py-3 flex items-center shadow-sm z-10">
+        <Search className="text-slate-400 mr-2 shrink-0" size={20} />
+        <input 
+          type="text" 
+          placeholder="앱 이름, 키워드, 태그로 AI(흐름) 검색..."
+          value={searchQuery}
+          onChange={e => setSearchQuery(e.target.value)}
+          className="w-full bg-transparent outline-none text-slate-700 font-medium placeholder:text-slate-300"
+        />
+      </div>
+
       <CategoryBar categories={categories} active={activeCategory} onSelect={setActiveCategory} />
       
-      <div className="flex-1 relative overflow-auto">
-        <ListView apps={filteredApps} onAppOpen={setSelectedApp} />
+      <div className="flex-1 relative overflow-auto pb-[100px]">
+        <ListView apps={displayApps} onAppOpen={setSelectedApp} />
       </div>
       
       <AppBottomSheet 

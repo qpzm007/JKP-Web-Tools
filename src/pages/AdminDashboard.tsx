@@ -16,6 +16,7 @@ interface AppDoc {
     executionType: string;
     contentInfo: string;
     tag?: string;
+    searchTags?: string[];
 }
 
 export default function AdminDashboard({ user }: { user: User | null }) {
@@ -107,6 +108,7 @@ export default function AdminDashboard({ user }: { user: User | null }) {
                 name: editForm.name,
                 desc: editForm.desc,
                 tag: editForm.tag,
+                searchTags: editForm.searchTags,
                 contentInfo: editForm.contentInfo
             });
             setApps(apps.map(a => a.id === id ? { ...a, ...editForm } : a));
@@ -267,6 +269,16 @@ export default function AdminDashboard({ user }: { user: User | null }) {
                                         </div>
 
                                         <div>
+                                            <label className="block text-xs font-bold text-slate-500 mb-1">검색 태그 (콤마 구분)</label>
+                                            <input 
+                                                value={(editForm.searchTags || []).join(', ')} 
+                                                onChange={e => setEditForm({...editForm, searchTags: e.target.value.split(',').map(t=>t.trim()).filter(Boolean)})}
+                                                className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-indigo-500"
+                                                placeholder="예: 뽀모도로, 타이머"
+                                            />
+                                        </div>
+
+                                        <div>
                                             <label className="block text-xs font-bold text-slate-500 mb-1">HTML 소스/링크 (Content Info)</label>
                                             <textarea 
                                                 value={editForm.contentInfo || ''} 
@@ -296,6 +308,11 @@ export default function AdminDashboard({ user }: { user: User | null }) {
                                                 ) : (
                                                     <span className="flex items-center gap-1 text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full"><CheckCircle size={12}/> 승인</span>
                                                 )}
+                                            </div>
+                                            <div className="flex gap-1 flex-wrap mb-2">
+                                                {(app.searchTags || []).map((t, i) => (
+                                                    <span key={i} className="text-[11px] bg-indigo-50 text-indigo-600 px-1.5 py-0.5 rounded border border-indigo-100">#{t}</span>
+                                                ))}
                                             </div>
                                             <p className="text-sm text-slate-600 mb-2 line-clamp-2">{app.desc}</p>
                                             
