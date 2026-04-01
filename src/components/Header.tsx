@@ -24,18 +24,18 @@ export default function Header({ isGravityView, onToggle, user }: HeaderProps) {
     const isAdmin = user !== null; // 임시: 로그인한 모든 테스트 유저 허용
 
     return (
-        <header className="bg-white px-4 py-3 flex flex-col md:flex-row md:justify-between items-start md:items-center gap-3 md:gap-0 shadow-sm z-40 relative">
+        <header className="bg-white px-3 sm:px-4 py-2 sm:py-3 flex justify-between items-center shadow-sm z-40 relative">
             <div 
-                className="flex items-center gap-2 cursor-pointer w-full md:w-auto" 
+                className="flex items-center gap-1.5 sm:gap-2 cursor-pointer shrink-0" 
                 onClick={() => navigate('/')}
             >
-                <div className="bg-indigo-600 text-white font-bold rounded p-1.5 text-sm flex items-center justify-center shrink-0">
-                    <Rocket size={16} />
+                <div className="bg-indigo-600 text-white font-bold rounded p-1 text-xs flex items-center justify-center">
+                    <Rocket size={14} />
                 </div>
-                <h1 className="font-bold text-lg tracking-tight text-slate-800">{t('JKP Web Tools')}</h1>
+                <h1 className="font-bold text-sm sm:text-lg tracking-tight text-slate-800 whitespace-nowrap">{t('JKP Web Tools')}</h1>
             </div>
             
-            <div className="flex items-center flex-wrap gap-2 sm:gap-3 w-full md:w-auto justify-start md:justify-end">
+            <div className="flex items-center gap-1 sm:gap-3 shrink-0">
                 <button 
                     className="p-2 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 active:scale-95 transition-all outline-none flex items-center justify-center" 
                     onClick={onToggle}
@@ -52,9 +52,9 @@ export default function Header({ isGravityView, onToggle, user }: HeaderProps) {
                     <Globe size={20} />
                 </button>
             
-                {!isUploadPage && (
+                {user && !isUploadPage && (
                     <button 
-                        className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-indigo-50 text-indigo-700 font-medium text-xs sm:text-sm hover:bg-indigo-100 transition-colors"
+                        className="flex items-center gap-1 px-2 py-1.5 rounded-full bg-indigo-50 text-indigo-700 font-medium text-xs sm:text-sm hover:bg-indigo-100 transition-colors"
                         onClick={() => navigate('/upload')}
                     >
                         <Plus size={14} /> <span className="hidden sm:inline">{t('앱 등록')}</span>

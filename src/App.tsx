@@ -85,10 +85,10 @@ function MainViews({ isGravityView }: { isGravityView: boolean }) {
       : liveApps.filter(app => app.tag.includes(activeCategory.replace(/[^가-힣]/g, '')));
 
   return (
-    <main className="flex-1 relative bg-slate-50 overflow-hidden flex flex-col">
+    <main className="flex-1 relative bg-slate-50 overflow-hidden flex flex-col h-screen h-[100dvh]">
       <CategoryBar categories={categories} active={activeCategory} onSelect={setActiveCategory} />
       
-      <div className="flex-1 relative">
+      <div className="flex-1 relative overflow-hidden">
           {isGravityView ? (
             <GravityView apps={filteredApps} isActive={true} onAppOpen={setSelectedApp} />
           ) : (

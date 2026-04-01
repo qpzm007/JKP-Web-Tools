@@ -60,7 +60,9 @@ export default function GravityView({ apps, isActive, onAppOpen }: GravityViewPr
         renderRef.current = render;
 
         const wallOpts = { isStatic: true, render: { visible: false } };
-        const ground = Bodies.rectangle(cw / 2, ch + 20, cw * 2, 60, { ...wallOpts, restitution: 0.5 });
+        
+        // Ground is shifted UP to prevent clipping below mobile screen edge
+        const ground = Bodies.rectangle(cw / 2, ch + 15, cw * 2, 60, { ...wallOpts, restitution: 0.5 });
         const leftWall = Bodies.rectangle(-30, ch / 2, 60, ch * 2, wallOpts);
         const rightWall = Bodies.rectangle(cw + 30, ch / 2, 60, ch * 2, wallOpts);
         const ceiling = Bodies.rectangle(cw / 2, -3000, cw * 2, 60, wallOpts); // Moved very high
@@ -143,7 +145,7 @@ export default function GravityView({ apps, isActive, onAppOpen }: GravityViewPr
             const newCh = sceneRef.current.clientHeight;
             render.canvas.width = newCw;
             render.canvas.height = newCh;
-            Matter.Body.setPosition(ground, { x: newCw / 2, y: newCh + 20 });
+            Matter.Body.setPosition(ground, { x: newCw / 2, y: newCh + 15 });
             Matter.Body.setPosition(rightWall, { x: newCw + 30, y: newCh / 2 });
         };
         window.addEventListener('resize', handleResize);
